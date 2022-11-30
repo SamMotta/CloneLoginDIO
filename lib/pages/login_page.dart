@@ -13,6 +13,41 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _senhaController = TextEditingController();
   bool _isObscured = true;
 
+  void _login() {
+    if (_emailController.text.trim() == "teste" &&
+        _senhaController.text.trim() == "123") {
+      // Você tem a habilidade de voltar pra tela anterior
+      // Navigator.push(
+      /* Você não tem a habilidade de votlar pra tela anterior, 
+                              se faz necessário fechar e abri o app */
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: const [
+              Text(
+                "E-Mail ou senha incorretos.",
+              ),
+              Text(
+                "E-Mail: teste | Senha: 123",
+                style: TextStyle(
+                  color: Colors.green
+                ),
+              ),
+            ],
+          ),
+          duration: const Duration(seconds: 10),
+        ),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -83,6 +118,9 @@ class _LoginPageState extends State<LoginPage> {
                   alignment: Alignment.center,
                   child: TextField(
                     controller: _senhaController,
+                    onEditingComplete: () {
+                      _login();
+                    },
                     obscureText: _isObscured,
                     decoration: InputDecoration(
                       hintText: "Senha",
@@ -114,29 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity,
                     child: TextButton(
                       onPressed: () {
-                        if (_emailController.text.trim() ==
-                                "samuel@gmail.com" &&
-                            _senhaController.text.trim() == "Hello") {
-                          // Você tem a habilidade de voltar pra tela anterior
-                          // Navigator.push(
-                          /* Você não tem a habilidade de votlar pra tela anterior, 
-                              se faz necessário fechar e abri o app */
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomePage(),
-                              ));
-                        } else {
-                          debugPrint("e-Mail ou senha incorretos.");
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "E-Mail ou senha incorretos.",
-                              ),
-                              duration: Duration(seconds: 10),
-                            ),
-                          );
-                        }
+                        _login();
                       },
                       style: ButtonStyle(
                         shape: MaterialStateProperty.all(RoundedRectangleBorder(

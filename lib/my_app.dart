@@ -7,12 +7,15 @@ import 'pages/login_page.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
+  static const bgTheme = Color.fromARGB(255, 30, 25, 44);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        drawerTheme: const DrawerThemeData(backgroundColor: bgTheme),
+        dividerTheme: const DividerThemeData(color: Colors.white, thickness: 1),
         primarySwatch:
             MaterialColor(Colors.lightBlue.shade900.value, <int, Color>{
           50: Color(Colors.lightBlue.shade50.value),
@@ -26,7 +29,7 @@ class MyApp extends StatelessWidget {
           800: Color(Colors.lightBlue.shade800.value),
           900: Color(Colors.lightBlue.shade900.value)
         }),
-        scaffoldBackgroundColor: const Color.fromARGB(255, 30, 25, 44),
+        scaffoldBackgroundColor: bgTheme,
         inputDecorationTheme: const InputDecorationTheme(
           contentPadding: EdgeInsets.only(bottom: 14),
           enabledBorder: UnderlineInputBorder(
