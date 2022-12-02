@@ -23,6 +23,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    colorPagesController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
@@ -63,15 +69,7 @@ class _HomePageState extends State<HomePage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const DadosCadastrais(
-                              texto: 'Meus Dados',
-                              dados: <String>[
-                                "Nome",
-                                "Endereço",
-                                "CPF",
-                                "Cidade"
-                              ],
-                            ),
+                            builder: (context) => const DadosCadastraisPage(),
                           ));
                     },
                   ),
