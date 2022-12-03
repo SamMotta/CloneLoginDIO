@@ -36,9 +36,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Text(
                 "E-Mail: teste | Senha: 123",
-                style: TextStyle(
-                  color: Colors.green
-                ),
+                style: TextStyle(color: Colors.green),
               ),
             ],
           ),

@@ -14,6 +14,25 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        // bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        //   backgroundColor: bgTheme,
+        // ),
+        cardColor: bgTheme,
+        dialogTheme: const DialogTheme(
+          backgroundColor: bgTheme,
+          iconColor: Colors.white,
+          titleTextStyle: TextStyle(
+            fontSize: 18,
+            color: Colors.white,
+          ),
+        ),
+        bottomSheetTheme: const BottomSheetThemeData(backgroundColor: bgTheme),
+        listTileTheme: const ListTileThemeData(
+          iconColor: Colors.white,
+          textColor: Colors.white,
+          style: ListTileStyle.drawer,
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         drawerTheme: const DrawerThemeData(backgroundColor: bgTheme),
         dividerTheme: const DividerThemeData(color: Colors.white, thickness: 1),
         primarySwatch:
