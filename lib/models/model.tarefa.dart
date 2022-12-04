@@ -8,7 +8,9 @@ class Tarefa {
   Tarefa(this._description, this._isFinished);
 
   String get id => _id;
+  // ignore: unnecessary_getters_setters
   String get description => _description;
+  // ignore: unnecessary_getters_setters
   bool get isFinished => _isFinished;
 
   set description(String value) {

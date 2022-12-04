@@ -13,10 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        // bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        //   backgroundColor: bgTheme,
-        // ),
+      theme: ThemeData(        
         cardColor: bgTheme,
         dialogTheme: const DialogTheme(
           backgroundColor: bgTheme,
@@ -50,6 +47,10 @@ class MyApp extends StatelessWidget {
         }),
         scaffoldBackgroundColor: bgTheme,
         inputDecorationTheme: const InputDecorationTheme(
+          labelStyle: TextStyle(
+            fontSize: 16,
+            color: Colors.white,
+          ),
           contentPadding: EdgeInsets.only(bottom: 14),
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(
