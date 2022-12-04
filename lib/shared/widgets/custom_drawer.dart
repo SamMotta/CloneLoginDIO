@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:trilhaapp/pages/dados_cadastrais.dart';
 import 'package:trilhaapp/pages/login_page.dart';
-import 'package:trilhaapp/pages/numeros_aleatorios/numeros_aleatorios_shared.dart';
-import 'package:trilhaapp/pages/settings.dart';
+import 'package:trilhaapp/pages/numeros_aleatorios/numeros_aleatorios_hive.dart';
+import 'package:trilhaapp/pages/settings_page/settings_hive_page.dart';
+// import 'package:trilhaapp/pages/numeros_aleatorios/numeros_aleatorios_shared.dart';
+// import 'package:trilhaapp/pages/settings_page/settings_shared_page.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -164,7 +166,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
+                MaterialPageRoute(builder: (context) => const SettingsHivePage()),
               );
             },
           ),
@@ -185,7 +187,7 @@ class CustomDrawer extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const NumerosAleatoriosSharedPage(),
+                    builder: (context) => const NumerosAleatoriosHivePage(),
                   ));
             },
           ),

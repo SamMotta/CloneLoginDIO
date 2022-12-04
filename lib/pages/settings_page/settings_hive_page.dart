@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trilhaapp/models/model.settings.dart';
+import 'package:trilhaapp/repositories/settings_repository.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+class SettingsHivePage extends StatefulWidget {
+  const SettingsHivePage({super.key});
 
   @override
-  State<SettingsPage> createState() => SettingsPageState();
+  State<SettingsHivePage> createState() => SettingsHivePageState();
 }
 
-class SettingsPageState extends State<SettingsPage> {
-  late SharedPreferences prefs;
+class SettingsHivePageState extends State<SettingsHivePage> {
+  late SettingsRepository storage;
+  SettingsModel model = SettingsModel.empty();
+
   TextEditingController usernameController = TextEditingController();
   TextEditingController userHeightController = TextEditingController();
-
-  String? user;
-  double? userHeight;
-  bool pushNotications = false;
-  bool lightTheme = false;
 
   @override
   void initState() {
@@ -25,15 +23,13 @@ class SettingsPageState extends State<SettingsPage> {
   }
 
   void loadData() async {
-    prefs = await SharedPreferences.getInstance();
+    storage = await SettingsRepository.load();
+    model = storage.get();
 
-    setState(() {
-      usernameController.text = prefs.getString("username") ?? "";
-      userHeightController.text =
-          (prefs.getDouble("userHeight") ?? 0).toString();
-      pushNotications = prefs.getBool("pushNotifications") ?? false;
-      lightTheme = prefs.getBool("lightTheme") ?? false;
-    });
+    usernameController.text = model.username;
+    userHeightController.text = model.height.toString();
+
+    setState(() {});
   }
 
   @override
@@ -73,10 +69,10 @@ class SettingsPageState extends State<SettingsPage> {
                   "Tema claro",
                   style: TextStyle(fontSize: 22),
                 ),
-                value: lightTheme,
+                value: model.lightTheme,
                 onChanged: (value) {
                   setState(() {
-                    lightTheme = value;
+                    model.lightTheme = value;
                   });
                 },
               ),
@@ -85,21 +81,18 @@ class SettingsPageState extends State<SettingsPage> {
                   "Receber notificações push",
                   style: TextStyle(fontSize: 22),
                 ),
-                value: pushNotications,
+                value: model.pushNotifications,
                 onChanged: (value) {
                   setState(() {
-                    pushNotications = value;
+                    model.pushNotifications = value;
                   });
                 },
               ),
               TextButton(
-                onPressed: () async {
+                onPressed: () {
                   FocusManager.instance.primaryFocus?.unfocus();
                   try {
-                    await prefs.setDouble(
-                      "userHeight",
-                      double.parse(userHeightController.text),
-                    );
+                    model.height = double.parse(userHeightController.text);
                   } catch (e) {
                     showDialog(
                       context: context,
@@ -108,24 +101,22 @@ class SettingsPageState extends State<SettingsPage> {
                         content: const Text("Digite uma altura válida!"),
                         actions: [
                           TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text("Fechar"))
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Fechar"),
+                          )
                         ],
                       ),
                     );
+                    return;
                   }
-                  await prefs.setString("username", usernameController.text);
-                  await prefs.setBool("pushNotifications", pushNotications);
-                  await prefs.setBool("lightTheme", lightTheme);
+
+                  model.username = usernameController.text;
+                  storage.save(model);
+                  Navigator.pop(context);
                 },
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Salvar"),
-                ),
+                child: const Text("Salvar"),
               ),
             ],
           ),
