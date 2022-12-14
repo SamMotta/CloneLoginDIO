@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:trilhaapp/models/model.tarefa.dart';
-import 'package:trilhaapp/repositories/tarefa_repository.dart';
+// import 'package:trilhaapp/models/model.tarefa.dart';
+// import 'package:trilhaapp/repositories/tarefa_repository.dart';
+import 'package:trilhaapp/models/model.tarefa_hive.dart';
+import 'package:trilhaapp/repositories/tarefa_hive_repository.dart';
 
 class TarefaPage extends StatefulWidget {
   const TarefaPage({super.key});
@@ -10,9 +12,11 @@ class TarefaPage extends StatefulWidget {
 }
 
 class _TarefaPageState extends State<TarefaPage> {
-  var tarefaRepo = TarefaRepository();
-  List<Tarefa> _tarefas = [];
+  // var tarefaRepo = TarefaRepository();
+  late TarefaHiveRepository tarefaRepo;
+  var _tarefas = <TarefaModel>[];
   TextEditingController descriptionController = TextEditingController();
+  bool filter = false;
 
   @override
   void initState() {
@@ -20,8 +24,16 @@ class _TarefaPageState extends State<TarefaPage> {
     obterTarefas();
   }
 
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
   void obterTarefas() async {
-    _tarefas = await tarefaRepo.listarTarefas();
+    tarefaRepo = await TarefaHiveRepository.load();
+    _tarefas = tarefaRepo.get(filter);
     setState(() {});
   }
 
@@ -52,11 +64,13 @@ class _TarefaPageState extends State<TarefaPage> {
                   child: const Text("Salvar"),
                   onPressed: () async {
                     Navigator.pop(context);
-                    await tarefaRepo.addTarefa(Tarefa(
-                      descriptionController.text.trim(),
-                      false,
-                    ));
-                    setState(() {});
+                    tarefaRepo.save(
+                      TarefaModel.create(
+                        descriptionController.text.trim(),
+                        false,
+                      ),
+                    );
+                    obterTarefas();
                   },
                 ),
               ],
@@ -65,24 +79,68 @@ class _TarefaPageState extends State<TarefaPage> {
         },
         child: const Icon(Icons.note_add),
       ),
-      body: ListView.builder(
-        itemCount: _tarefas.length,
-        itemBuilder: (context, index) {
-          Tarefa tarefa = _tarefas[index];
-          return Dismissible(
-            key: Key(tarefa.id),
-            child: ListTile(
-              title: Text(tarefa.description),
-              trailing: Switch(
-                value: tarefa.isFinished,
-                onChanged: (value) async {
-                  await tarefaRepo.alterarTarefa(tarefa.id, value);
-                  obterTarefas();
+      body: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Apenas não concluídos",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Switch(
+                    value: filter,
+                    onChanged: (value) {
+                      filter = !filter;
+                      obterTarefas();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _tarefas.length,
+                itemBuilder: (context, index) {
+                  TarefaModel tarefa = _tarefas[index];
+                  return Dismissible(
+                    direction: DismissDirection.startToEnd,
+                    background: Container(
+                      padding: const EdgeInsets.only(left: 12),
+                      alignment: Alignment.centerLeft,
+                      color: Colors.red,
+                      child: const Icon(Icons.delete),
+                    ),
+                    onDismissed: (direction) {
+                      tarefaRepo.delete(tarefa);
+                      obterTarefas();
+                    },
+                    //  Só para testes
+                    key: Key(tarefa.key.toString()),
+                    child: ListTile(
+                      title: Text(tarefa.description),
+                      trailing: Switch(
+                        value: tarefa.isFinished,
+                        onChanged: (value) {
+                          tarefa.isFinished = value;
+                          tarefaRepo.update(tarefa);
+                          obterTarefas();
+                        },
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }

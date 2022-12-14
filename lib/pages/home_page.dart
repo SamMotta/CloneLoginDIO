@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:trilhaapp/pages/image_assets.dart';
 import 'package:trilhaapp/pages/card_page.dart';
 import 'package:trilhaapp/pages/list_view_horizontal.dart';
-import 'package:trilhaapp/pages/list_view_v.dart';
+import 'package:trilhaapp/pages/list_view_vertical.dart';
 import 'package:trilhaapp/pages/tarefas_page.dart';
 import 'package:trilhaapp/shared/widgets/custom_drawer.dart';
 

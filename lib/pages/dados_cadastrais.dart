@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:trilhaapp/models/model.dados_cadastrais.dart';
+import 'package:trilhaapp/repositories/dados_cadastrais_repository.dart';
 import 'package:trilhaapp/repositories/linguagens_repository.dart';
 import 'package:trilhaapp/repositories/niveis_repository.dart';
 
@@ -22,18 +24,14 @@ class DadosCadastraisPage extends StatefulWidget {
 }
 
 class _DadosCadastraisPageState extends State<DadosCadastraisPage> {
-  final TextEditingController _nameController = TextEditingController(text: "");
-  final TextEditingController _birthdayController =
-      TextEditingController(text: "");
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _birthdayController = TextEditingController();
 
-  DateTime? _birthday;
-  String _selectedLevel = "";
-  final List<String> _selectedLangs = [];
+  late DadosCadastraisRepository cadastrosRepo;
+  DadosCadastrais cadastroModel = DadosCadastrais.empty();
+
   List<String> _levels = [];
   List<String> _langs = [];
-
-  int _timeExperience = 0;
-  double _wageExpectation = 0;
 
   Text dataTemplateLabel(String text) {
     return Text(
@@ -71,9 +69,28 @@ class _DadosCadastraisPageState extends State<DadosCadastraisPage> {
 
   @override
   void initState() {
+    super.initState();
     _levels = NiveisRepository.returnLevels();
     _langs = LinguagensRepository.returnLangs();
-    super.initState();
+    loadData();
+  }
+
+  void loadData() async {
+    cadastrosRepo = await DadosCadastraisRepository.load();
+    cadastroModel = cadastrosRepo.get();
+    _nameController.text = cadastroModel.name ?? "";
+    _birthdayController.text =
+        cadastroModel.birthday == null ? "" : cadastroModel.birthday.toString();
+
+    if (_birthdayController.text.isNotEmpty) {
+      cadastroModel.birthday = DateTime.parse(_birthdayController.text);
+    }
+
+    cadastroModel.langs = cadastroModel.langs;
+    cadastroModel.experienceTime = cadastroModel.experienceTime ?? 0;
+    cadastroModel.experienceLevel = cadastroModel.experienceLevel ?? "";
+    cadastroModel.wageExpectation = cadastroModel.wageExpectation ?? 0;
+    setState(() {});
   }
 
   @override
@@ -117,7 +134,7 @@ class _DadosCadastraisPageState extends State<DadosCadastraisPage> {
 
                   if (birthday != null) {
                     _birthdayController.text = birthday.toString();
-                    _birthday = birthday;
+                    cadastroModel.birthday = birthday;
                   }
                 },
               ),
@@ -131,11 +148,11 @@ class _DadosCadastraisPageState extends State<DadosCadastraisPage> {
                       (level) => RadioListTile(
                         title: Text(level.toString()),
                         value: level.toString(),
-                        selected: _selectedLevel == level,
-                        groupValue: _selectedLevel,
+                        selected: cadastroModel.experienceLevel == level,
+                        groupValue: cadastroModel.experienceLevel,
                         onChanged: (value) {
                           setState(() {
-                            _selectedLevel = value.toString();
+                            cadastroModel.experienceLevel = value.toString();
                           });
                         },
                       ),
@@ -151,15 +168,15 @@ class _DadosCadastraisPageState extends State<DadosCadastraisPage> {
                     .map(
                       (lang) => CheckboxListTile(
                         title: Text(lang.toString()),
-                        value: _selectedLangs.contains(lang),
+                        value: cadastroModel.langs.contains(lang),
                         onChanged: (value) {
                           if (value!) {
                             setState(() {
-                              _selectedLangs.add(lang);
+                              cadastroModel.langs.add(lang);
                             });
                           } else {
                             setState(() {
-                              _selectedLangs.remove(lang);
+                              cadastroModel.langs.remove(lang);
                             });
                           }
                         },
@@ -172,14 +189,14 @@ class _DadosCadastraisPageState extends State<DadosCadastraisPage> {
                 child: dataTemplateLabel("Tempo de experiência"),
               ),
               DropdownButton(
-                value: _timeExperience,
+                value: cadastroModel.experienceTime,
                 isExpanded: true,
                 items: returnMenuItems(10),
                 dropdownColor: const Color.fromARGB(255, 30, 25, 44),
                 style: const TextStyle(fontSize: 18, color: Colors.white),
                 onChanged: (value) {
                   setState(() {
-                    _timeExperience = value!;
+                    cadastroModel.experienceTime = value;
                   });
                 },
               ),
@@ -187,9 +204,9 @@ class _DadosCadastraisPageState extends State<DadosCadastraisPage> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: dataTemplateLabel("Pretensão Salarial"),
               ),
-              _wageExpectation > 0
+              cadastroModel.wageExpectation! > 0
                   ? Text(
-                      "Pretensão salarial R\$ ${_wageExpectation.toStringAsFixed(0)}",
+                      "Pretensão salarial R\$ ${cadastroModel.wageExpectation!.toStringAsFixed(0)}",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -205,42 +222,70 @@ class _DadosCadastraisPageState extends State<DadosCadastraisPage> {
               Slider(
                 min: 0,
                 max: 100000,
-                value: _wageExpectation,
+                value: cadastroModel.wageExpectation!,
                 onChanged: (value) {
                   setState(() {
-                    _wageExpectation = value;
+                    cadastroModel.wageExpectation = value;
                   });
                 },
               ),
               TextButton(
                 onPressed: () {
                   if (_nameController.text.trim().length < 3) {
-                    validationError("O nome deve ser preenchido!");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("O nome deve ser preenchido!"),
+                      ),
+                    );
                     return;
                   }
 
-                  if (_birthday == null) {
-                    validationError("Data de Nascimento inválida!");
+                  if (cadastroModel.birthday == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Data de Nascimento inválida!"),
+                      ),
+                    );
                     return;
                   }
 
-                  if (_selectedLevel.trim() == '') {
-                    validationError("Um nível deve ser selecionado!");
+                  if (cadastroModel.experienceLevel == null ||
+                      cadastroModel.experienceLevel!.trim() == '') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Um nível deve ser selecionado!"),
+                      ),
+                    );
                     return;
                   }
 
-                  if (_selectedLangs.isEmpty) {
-                    validationError("Ao menos uma linguagem de programação"
-                        "deve ser selecionada!");
+                  if (cadastroModel.langs.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "Ao menos uma linguagem de programação deve ser selecionada!",
+                        ),
+                      ),
+                    );
+
                     return;
                   }
 
-                  if (_timeExperience < 0) {
-                    validationError("Selecione um tempo de experiência válido");
+                  if (cadastroModel.experienceTime == null ||
+                      cadastroModel.experienceTime! < 0) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content:
+                            Text("Selecione um tempo de experiência válido"),
+                      ),
+                    );
                     return;
                   }
 
-                  debugPrint("Dados salvos");
+                  cadastroModel.name = _nameController.text.trim();
+                  cadastrosRepo.save(cadastroModel);
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  Navigator.pop(context);
                 },
                 child: const Text("Salvar"),
               ),

@@ -20,6 +20,14 @@ class _CardPageState extends State<CardPage> {
     loadData();
   }
 
+  // Para evitar state após o dispose da página/componente
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
   void loadData() async {
     cardDetail = await cardDetailRepo.getCardDetail();
     setState(() {});
