@@ -3,7 +3,8 @@ import 'package:trilhaapp/pages/image_assets.dart';
 import 'package:trilhaapp/pages/card_page.dart';
 import 'package:trilhaapp/pages/list_view_horizontal.dart';
 import 'package:trilhaapp/pages/list_view_vertical.dart';
-import 'package:trilhaapp/pages/tarefas_page.dart';
+import 'package:trilhaapp/pages/tarefas_page/tarefa_sqlite_page.dart';
+// import 'package:trilhaapp/pages/tarefas_page/tarefas_page.dart';
 import 'package:trilhaapp/shared/widgets/custom_drawer.dart';
 
 class HomePage extends StatefulWidget {
@@ -95,7 +96,7 @@ class _HomePageState extends State<HomePage> {
                     ImageAssetsPage(),
                     ListViewVPage(),
                     ListViewHPage(),
-                    TarefaPage(),
+                    TarefaSQLitePage(),
                   ],
                 ),
               ),
