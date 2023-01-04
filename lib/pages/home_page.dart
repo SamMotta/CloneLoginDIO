@@ -4,6 +4,7 @@ import 'package:trilhaapp/pages/card_page.dart';
 import 'package:trilhaapp/pages/list_view_horizontal.dart';
 import 'package:trilhaapp/pages/list_view_vertical.dart';
 import 'package:trilhaapp/pages/tarefas_page/tarefa_sqlite_page.dart';
+import 'package:trilhaapp/pages/consulta_cep_page.dart';
 // import 'package:trilhaapp/pages/tarefas_page/tarefas_page.dart';
 import 'package:trilhaapp/shared/widgets/custom_drawer.dart';
 
@@ -43,6 +44,13 @@ class _HomePageState extends State<HomePage> {
               _changePage(posValue);
             },
             items: const [
+              BottomNavigationBarItem(
+                label: "http",
+                icon: Icon(
+                  Icons.http,
+                  color: Colors.greenAccent,
+                ),
+              ),
               BottomNavigationBarItem(
                 label: "Red",
                 icon: Icon(
@@ -92,6 +100,7 @@ class _HomePageState extends State<HomePage> {
                   controller: colorPagesController,
                   onPageChanged: _changePage,
                   children: const [
+                    ConsultaCepPage(),
                     CardPage(),
                     ImageAssetsPage(),
                     ListViewVPage(),
